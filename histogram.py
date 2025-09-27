@@ -1,9 +1,32 @@
-def calculate_average(score_list):
-    for i in range(len(score_list)):
-        if score_list[i] :
-            average = average + score_list[i]
-    return average / len(score_list) if len(score_list) > 0 else 0
+import matplotlib.pyplot as plt
 
+def calculate_average(score_list):
+    if len(score_list) == 0:
+        return 0
+    average = sum(score_list)
+    result = average / len(score_list)
+    return result
+
+def search_min(gryffindor, slytherin, hufflepuff, ravenclaw):
+    all_notes = gryffindor + slytherin + hufflepuff + ravenclaw
+    return min(all_notes) if all_notes else 0
+
+def normalize(notes_list, min):
+    if min >= 0:
+        return notes_list
+    for i in range(len(notes_list)):
+        notes_list[i] += abs(min) + 1
+    return notes_list
+
+def calculate_std(mean_list):
+    if len(mean_list) == 0:
+        return 0
+    m = sum(mean_list) / len(mean_list)
+    total = 0
+    for mean in mean_list:
+        total += (mean - m) ** 2
+    std = total / len(mean_list)
+    return std ** 0.5
 
 with open('./datasets/dataset_train.csv', 'r') as file:
     content = file.read()
@@ -11,52 +34,100 @@ with open('./datasets/dataset_train.csv', 'r') as file:
 lines = content.split('\n')
 header = lines[0].split(',')
 
-gryffindor_students = []
-slytherin_students = []
-hufflepuff_students = []
-ravenclaw_students = []
-arithmancy_gryffindor_students = []
-arithmancy_slytherin_students = []
-arithmancy_hufflepuff_students = []
-arithmancy_ravenclaw_students = []
-
+all_cv = []
+all_students = []
 for i in range(1, len(lines)):
     if lines[i]:
         student_data = lines[i].split(',')
-        house = student_data[1]
-        arithmancy = student_data[6]
+        all_students.append(student_data)
 
-        if house == "Gryffindor":
-            gryffindor_students.append(student_data)
-            if arithmancy:
-                arithmancy_gryffindor_students.append(float(arithmancy))
-        elif house == "Slytherin":
-            slytherin_students.append(student_data)
-            if arithmancy:
-                arithmancy_slytherin_students.append(float(arithmancy))
-        elif house == "Hufflepuff":
-            hufflepuff_students.append(student_data)
-            if arithmancy:
-                arithmancy_hufflepuff_students.append(float(arithmancy))
-        elif house == "Ravenclaw":
-            ravenclaw_students.append(student_data)
-            if arithmancy:
-                arithmancy_ravenclaw_students.append(float(arithmancy))
+for subject_index in range(6, len(header)):
+    if header[subject_index]:
+        subject_name = header[subject_index]
 
-# TEST POUR VERIFIER LE NOMBRE D'ETUDIANT
-#
-# print(f"Gryffindor: {len(gryffindor_students)} étudiants")
-# print(f"Slytherin: {len(slytherin_students)} étudiants")
-# print(f"Hufflepuff: {len(hufflepuff_students)} étudiants")
-# print(f"Ravenclaw: {len(ravenclaw_students)} étudiants")
+        gryffindor_notes = []
+        slytherin_notes = []
+        hufflepuff_notes = []
+        ravenclaw_notes = []
+        for student in all_students:
+            house = student[1]
+            note = student[subject_index]
+            if note:
+                try:
+                    if house == "Gryffindor":
+                        gryffindor_notes.append(float(note))
+                    elif house == "Slytherin":
+                        slytherin_notes.append(float(note))
+                    elif house == "Hufflepuff":
+                        hufflepuff_notes.append(float(note))
+                    elif house == "Ravenclaw":
+                        ravenclaw_notes.append(float(note))
 
-# print(f"Gryffindor: {arithmancy_gryffindor_students[:5]}")
-# print(f"Slytherin: {arithmancy_slytherin_students[:5]}")
-# print(f"Hufflepuff: {arithmancy_hufflepuff_students[:5]}")
-# print(f"Ravenclaw: {arithmancy_ravenclaw_students[:5]}")
+                except ValueError:
+                    pass
+        
+        min_house = search_min(gryffindor_notes, slytherin_notes, hufflepuff_notes, ravenclaw_notes)
+        gryffindor_notes = normalize(gryffindor_notes, min_house)
+        slytherin_notes = normalize(slytherin_notes, min_house)
+        hufflepuff_notes = normalize(hufflepuff_notes, min_house)
+        ravenclaw_notes = normalize(ravenclaw_notes, min_house)
 
-# total = len(gryffindor_students) + len(slytherin_students) + len(hufflepuff_students) + len(ravenclaw_students)
-# print("Etudiants totaux : ", total)
+        averages = [
+            calculate_average(gryffindor_notes),
+            calculate_average(slytherin_notes), 
+            calculate_average(hufflepuff_notes),
+            calculate_average(ravenclaw_notes)
+        ]
 
-gryffindor_moyenne = calculate_average(arithmancy_gryffindor_students)
+        std = calculate_std(averages)
+        if calculate_average(averages) == 0 :
+            print("division par 0")
+        # Coefficient de Variation
+        cv = (std / calculate_average(averages)) * 100
 
+        all_cv.append(cv)
+
+min_cv = min(all_cv)
+min_index = all_cv.index(min_cv)
+
+# Retrouver le nom de la matière
+subject_names = []
+for subject_index in range(6, len(header)):
+    if header[subject_index]:
+        subject_names.append(header[subject_index])
+
+most_homogeneous = subject_names[min_index]
+
+print(f"🏆 MOST HOMOGENEOUS COURSE: {most_homogeneous}")
+print(f"📊 COEFFICIENT OF VARIATION: {min_cv:.2f}%")
+                
+gryffindor_origin = []
+slytherin_origin = []
+hufflepuff_origin = []
+ravenclaw_origin = []
+for student in all_students:
+    house = student[1]
+    note = student[min_index + 6]
+    if note:
+        try:
+            if house == "Gryffindor":
+                gryffindor_origin.append(float(note))
+            elif house == "Slytherin":
+                slytherin_origin.append(float(note))
+            elif house == "Hufflepuff":
+                hufflepuff_origin.append(float(note))
+            elif house == "Ravenclaw":
+                ravenclaw_origin.append(float(note))
+
+        except ValueError:
+            pass
+
+plt.hist(ravenclaw_origin, bins=20, alpha=0.7, label="Ravenclaw")
+plt.hist(hufflepuff_origin, bins=20, alpha=0.7, label="Hufflepuff") 
+plt.hist(gryffindor_origin, bins=20, alpha=0.7, label="Gryffindor")
+plt.hist(slytherin_origin, bins=20, alpha=0.7, label="Slytherin")
+plt.title(f"Distribution of grades - {most_homogeneous}")
+plt.xlabel("GRADES")
+plt.ylabel("NUMBER OF STUDENTS")
+plt.legend()
+plt.show()
