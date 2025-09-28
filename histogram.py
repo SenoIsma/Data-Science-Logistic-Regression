@@ -11,12 +11,9 @@ def search_min(gryffindor, slytherin, hufflepuff, ravenclaw):
     all_notes = gryffindor + slytherin + hufflepuff + ravenclaw
     return min(all_notes) if all_notes else 0
 
-def normalize(notes_list, min):
-    if min >= 0:
-        return notes_list
-    for i in range(len(notes_list)):
-        notes_list[i] += abs(min) + 1
-    return notes_list
+def normalize_positive(notes_list, global_min):
+    # Décaler pour que le minimum soit à 1 (évite les moyennes nulles)
+    return [note - global_min + 1 for note in notes_list]
 
 def calculate_std(mean_list):
     if len(mean_list) == 0:
@@ -40,6 +37,18 @@ for i in range(1, len(lines)):
     if lines[i]:
         student_data = lines[i].split(',')
         all_students.append(student_data)
+
+# Calculer le minimum global sur toutes les matières
+global_min = float('inf')
+for subject_index in range(6, len(header)):
+    if header[subject_index]:
+        for student in all_students:
+            note = student[subject_index]
+            if note:
+                try:
+                    global_min = min(global_min, float(note))
+                except ValueError:
+                    pass
 
 for subject_index in range(6, len(header)):
     if header[subject_index]:
@@ -65,12 +74,12 @@ for subject_index in range(6, len(header)):
 
                 except ValueError:
                     pass
-        
-        min_house = search_min(gryffindor_notes, slytherin_notes, hufflepuff_notes, ravenclaw_notes)
-        gryffindor_notes = normalize(gryffindor_notes, min_house)
-        slytherin_notes = normalize(slytherin_notes, min_house)
-        hufflepuff_notes = normalize(hufflepuff_notes, min_house)
-        ravenclaw_notes = normalize(ravenclaw_notes, min_house)
+
+        # Normalisation avec le minimum global
+        gryffindor_notes = normalize_positive(gryffindor_notes, global_min)
+        slytherin_notes = normalize_positive(slytherin_notes, global_min)
+        hufflepuff_notes = normalize_positive(hufflepuff_notes, global_min)
+        ravenclaw_notes = normalize_positive(ravenclaw_notes, global_min)
 
         averages = [
             calculate_average(gryffindor_notes),
@@ -84,7 +93,7 @@ for subject_index in range(6, len(header)):
             print("division par 0")
         # Coefficient de Variation
         cv = (std / calculate_average(averages)) * 100
-
+        print(cv)
         all_cv.append(cv)
 
 min_cv = min(all_cv)
