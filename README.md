@@ -123,7 +123,7 @@ After applying global minimum normalization, the results show:
 
 <h3>Scatter Plot Analysis</h3>
 
-#### Pearson's correlation coefficient :
+#### Pearson's correlation coefficient
 
 ```
         Σ[(xi - x̄)(yi - ȳ)]
@@ -142,6 +142,18 @@ r = ─────────────────────────�
 2. For each course, loop through all subsequent courses until the last one
 3. Keep the names of the two courses and the correlation coefficient result
 4. Display the students' marks for the two subjects with the highest correlation coefficient in absolute value in a scatter plot
+
+#### Correlation coefficient analysis
+
+For two features, the coefficient is always between [-1; 1], meaning that if :
+- coef is close to 0 => no correlation between the two features
+- coef is close to 1 => strong correlation, the two features evolve in the same way
+- coef is close to -1 => strong correlation but when the first feature evolves, the second one goes the opposite way
+
+#### Results
+
+Highest correlation is between Astronomy and Defense Against the Dark Arts: -1.0000.
+It means that there is a strong correlation between the two courses but a decreasing one. In other words, the higher a student's grade in Astronomy, the lower their grade in Dark Arts and vice versa.
 
 <h3>Pair Plot Analysis</h3>
 
