@@ -71,6 +71,7 @@ Identify which Hogwarts course has the most homogeneous score distribution betwe
 3. **House Segregation**: Separate students by their Hogwarts house for each subject
 
 #### Homogeneity Measurement
+
 We used the **Coefficient of Variation (CV)** to measure homogeneity between houses:
 
 ```
@@ -79,27 +80,68 @@ CV = (standard_deviation / mean) × 100
 
 The CV measures relative dispersion - the lower the CV, the more homogeneous the distribution.
 
+**Data Normalization:**
+
+To ensure fair comparison and avoid issues with negative or very small values, all grades are normalized using the global minimum across all subjects. Each score is shifted so that the minimum value becomes 1:
+
+```
+normalized_score = original_score - global_min + 1
+```
+
+This normalization is applied before calculating house averages and the CV.
 
 #### Algorithm Steps
 1. For each subject:
+   - Apply global minimum normalization to all scores
    - Calculate average score per house
-   - Apply normalization if negative values exist
    - Compute standard deviation of the four house averages
    - Calculate CV of house averages
 2. Identify subject with lowest CV
 
 #### Results
 
+After applying global minimum normalization, the results show:
+
 | Subject | CV (%) |
 |---------|--------|
-| **Arithmancy** | **0.57** |
-| Care of Magical Creatures | 1.29 |
-| Transfiguration | 4.20 |
-| Ancient Runes | 19.67 |
-| Potions | 20.53 |
+| Arithmancy | 0.57 |
+| Astronomy | 2.02 |
+| Herbology | 0.02 |
+| Defense Against the Dark Arts | 0.02 |
+| Divination | 0.02 |
+| Muggle Studies | 1.76 |
+| Ancient Runes | 0.39 |
+| History of Magic | 0.02 |
+| Transfiguration | 0.17 |
+| Potions | 0.01 |
+| **Care of Magical Creatures** | **0.00** |
+| Charms | 0.03 |
+| Flying | 0.40 |
+
+**🏆 Most Homogeneous Course: Care of Magical Creatures (CV: 0.00%)**
 
 
 <h3>Scatter Plot Analysis</h3>
+
+#### Pearson's correlation coefficient :
+
+```
+        Σ[(xi - x̄)(yi - ȳ)]
+r = ─────────────────────────────
+    √[Σ(xi - x̄)²] × √[Σ(yi - ȳ)²]
+```
+
+1. Averages of each of the two subjects (x and y)
+2. Numerator
+3. Variances of each of the two subjects
+4. Numerator / Multiplication of the two variances
+
+#### Algorithm Steps
+
+1. Loop through each course except the last one
+2. For each course, loop through all subsequent courses until the last one
+3. Keep the names of the two courses and the correlation coefficient result
+4. Display the students' marks for the two subjects with the highest correlation coefficient in absolute value in a scatter plot
 
 <h3>Pair Plot Analysis</h3>
 
