@@ -1,135 +1,142 @@
-import sys
-import csv
 import matplotlib.pyplot as plt
 
-def lire_csv(fichier):
-    tableau = []
-    try:
-        with open(fichier, "r", encoding="utf-8") as f:
-            lecteur = csv.reader(f, delimiter=",")  # ou ";" selon ton fichier
-            for ligne in lecteur:
-                tableau.append(ligne)
-        return tableau
-    except FileNotFoundError:
-        print(f"Erreur : le fichier {fichier} n'existe pas.")
-        return []
-    
-def is_numeric_column(tableau, col_index):
-    if col_index == 0:
-        return False  # Ignorer la première colonne
-    numeric_count = 0
-    for row in tableau[1:]:
-        if col_index < len(row) and row[col_index].strip():  # ignorer les cellules vides
-            try:
-                float(row[col_index])
-                numeric_count += 1
-            except ValueError:
-                return False  # Si une valeur n'est pas numérique, la colonne ne l'est pas
-    
-    return numeric_count > 0  # Au moins une valeur numérique trouvée
+def calculate_average(score_list):
+    if len(score_list) == 0:
+        return 0
+    average = sum(score_list)
+    result = average / len(score_list)
+    return result
 
-def mean(tableau, col_index, house):
+def search_min(gryffindor, slytherin, hufflepuff, ravenclaw):
+    all_notes = gryffindor + slytherin + hufflepuff + ravenclaw
+    return min(all_notes) if all_notes else 0
+
+def normalize_positive(notes_list, global_min):
+    # Décaler pour que le minimum soit à 1 (évite les moyennes nulles)
+    return [note - global_min + 1 for note in notes_list]
+
+def calculate_std(mean_list):
+    if len(mean_list) == 0:
+        return 0
+    m = sum(mean_list) / len(mean_list)
     total = 0
-    count = 0
-    for row in tableau[1:]:  # Ignorer l'en-tête
-        if (house == row[1] or house is None) and row[col_index].strip():
-            total += float(row[col_index])
-            count += 1
-        else:
-            continue
-    return total / count if count > 0 else 0
+    for mean in mean_list:
+        total += (mean - m) ** 2
+    std = total / len(mean_list)
+    return std ** 0.5
 
-def std(tableau, col_index, house):
-    m = mean(tableau, col_index, house)
-    total = 0
-    count = 0
-    for row in tableau[1:]:  # Ignorer l'en-tête
-        if (house == row[1] or house is None) and row[col_index].strip():
-            val = float(row[col_index])
-            total += (val - m) ** 2
-            count += 1
-        else:
-            continue
-    variance = total / count if count > 0 else 0
-    return variance ** 0.5
+with open('./datasets/dataset_train.csv', 'r') as file:
+    content = file.read()
 
-# def mean(tableau, col_index):
-#     total = 0
-#     count = 0
-#     for row in tableau[1:]:  # Ignorer l'en-tête
-#         try:
-#             total += float(row[col_index])
-#             count += 1
-#         except (ValueError, IndexError):
-#             continue
-#     return total / count if count > 0 else 0
+lines = content.split('\n')
+header = lines[0].split(',')
 
-# def std(tableau, col_index):
-#     m = mean(tableau, col_index)
-#     total = 0
-#     count = 0
-#     for row in tableau[1:]:  # Ignorer l'en-tête
-#         try:
-#             val = float(row[col_index])
-#             total += (val - m) ** 2
-#             count += 1
-#         except (ValueError, IndexError):
-#             continue
-#     variance = total / count if count > 0 else 0
-#     return variance ** 0.5
+all_cv = []
+all_students = []
+for i in range(1, len(lines)):
+    if lines[i]:
+        student_data = lines[i].split(',')
+        all_students.append(student_data)
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: python main.py <fichier>")
-        return
+# Calculer le minimum global sur toutes les matières
+global_min = float('inf')
+for subject_index in range(6, len(header)):
+    if header[subject_index]:
+        for student in all_students:
+            note = student[subject_index]
+            if note:
+                try:
+                    global_min = min(global_min, float(note))
+                except ValueError:
+                    pass
 
-    fichier = sys.argv[1]  # le premier argument après le script
-    data = lire_csv(fichier)
+for subject_index in range(6, len(header)):
+    if header[subject_index]:
+        subject_name = header[subject_index]
 
-    labels = ["", "Gryffindor", "Ravenclaw", "Hufflepuff", "Slytherin"]
-    results = [[label] for label in labels]  # transforme chaque label en sous-liste
+        gryffindor_notes = []
+        slytherin_notes = []
+        hufflepuff_notes = []
+        ravenclaw_notes = []
+        for student in all_students:
+            house = student[1]
+            note = student[subject_index]
+            if note:
+                try:
+                    if house == "Gryffindor":
+                        gryffindor_notes.append(float(note))
+                    elif house == "Slytherin":
+                        slytherin_notes.append(float(note))
+                    elif house == "Hufflepuff":
+                        hufflepuff_notes.append(float(note))
+                    elif house == "Ravenclaw":
+                        ravenclaw_notes.append(float(note))
 
-    for col_index in range(len(data[0])):  # pour chaque cours on cherche l'écart-type
-        if is_numeric_column(data, col_index):
-            results[0].append(data[0][col_index])
-            for house in range(0, 4):
-                results[house + 1].append(std(data, col_index, labels[house + 1]))
+                except ValueError:
+                    pass
 
-    house = 0
-    diff = [None] * 4
-    for col_index in range(1, len(results[0])):
-        print(col_index)
-        diff[house] =  std(results, col_index, None)
-    for col_index in range(len(data[0])):  # pour chaque colonne
-        if is_numeric_column(data, col_index):
-            results[0].append(data[0][col_index])
-            gryffindor_scores = [float(row[col_index]) for row in data[1:]
-                                if row[1] == "Gryffindor" and row[col_index].strip()]
-            ravenclaw_scores = [float(row[col_index]) for row in data[1:]
-                                if row[1] == "Ravenclaw" and row[col_index].strip()]
-            hufflepuff_scores = [float(row[col_index]) for row in data[1:]
-                                if row[1] == "Hufflepuff" and row[col_index].strip()]
-            slytherin_scores = [float(row[col_index]) for row in data[1:]
-                                if row[1] == "Slytherin" and row[col_index].strip()]
+        # Normalisation avec le minimum global
+        gryffindor_notes = normalize_positive(gryffindor_notes, global_min)
+        slytherin_notes = normalize_positive(slytherin_notes, global_min)
+        hufflepuff_notes = normalize_positive(hufflepuff_notes, global_min)
+        ravenclaw_notes = normalize_positive(ravenclaw_notes, global_min)
 
-    for row in results:
-        print(row)
-    # print("Gryffindor:", gryffindor_scores)
-    # print("Ravenclaw:", ravenclaw_scores)
-    # print("Hufflepuff:", hufflepuff_scores)
-    # print("Slytherin:", slytherin_scores)
-    
-    plt.hist(gryffindor_scores, bins=20, alpha=0.7, label="Gryffindor")
-    plt.hist(ravenclaw_scores, bins=20, alpha=0.7, label="Ravenclaw")
-    plt.hist(hufflepuff_scores, bins=20, alpha=0.7, label="Hufflepuff")
-    plt.hist(slytherin_scores, bins=20, alpha=0.7, label="Slytherin")
-    plt.legend()
-    plt.title("Histogramme des écarts-types par maison")
-    plt.xlabel("Valeurs")
-    plt.ylabel("Ecarts-types")
-    # plt.show()
+        averages = [
+            calculate_average(gryffindor_notes),
+            calculate_average(slytherin_notes), 
+            calculate_average(hufflepuff_notes),
+            calculate_average(ravenclaw_notes)
+        ]
 
-    return 0
+        std = calculate_std(averages)
+        if calculate_average(averages) == 0 :
+            print("division par 0")
+        # Coefficient de Variation
+        cv = (std / calculate_average(averages)) * 100
+        print(cv)
+        all_cv.append(cv)
 
-if __name__ == "__main__":
-    main()
+min_cv = min(all_cv)
+min_index = all_cv.index(min_cv)
+
+# Retrouver le nom de la matière
+subject_names = []
+for subject_index in range(6, len(header)):
+    if header[subject_index]:
+        subject_names.append(header[subject_index])
+
+most_homogeneous = subject_names[min_index]
+
+print(f"🏆 MOST HOMOGENEOUS COURSE: {most_homogeneous}")
+print(f"📊 COEFFICIENT OF VARIATION: {min_cv:.2f}%")
+                
+gryffindor_origin = []
+slytherin_origin = []
+hufflepuff_origin = []
+ravenclaw_origin = []
+for student in all_students:
+    house = student[1]
+    note = student[min_index + 6]
+    if note:
+        try:
+            if house == "Gryffindor":
+                gryffindor_origin.append(float(note))
+            elif house == "Slytherin":
+                slytherin_origin.append(float(note))
+            elif house == "Hufflepuff":
+                hufflepuff_origin.append(float(note))
+            elif house == "Ravenclaw":
+                ravenclaw_origin.append(float(note))
+
+        except ValueError:
+            pass
+
+plt.hist(ravenclaw_origin, bins=20, alpha=0.7, label="Ravenclaw")
+plt.hist(hufflepuff_origin, bins=20, alpha=0.7, label="Hufflepuff") 
+plt.hist(gryffindor_origin, bins=20, alpha=0.7, label="Gryffindor")
+plt.hist(slytherin_origin, bins=20, alpha=0.7, label="Slytherin")
+plt.title(f"Distribution of grades - {most_homogeneous}")
+plt.xlabel("GRADES")
+plt.ylabel("NUMBER OF STUDENTS")
+plt.legend()
+plt.show()
