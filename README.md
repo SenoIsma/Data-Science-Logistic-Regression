@@ -157,5 +157,42 @@ It means that there is a strong correlation between the two courses but a decrea
 
 <h3>Pair Plot Analysis</h3>
 
+#### Objective
+Create a comprehensive pair plot visualization that displays the relationships between all Hogwarts courses, showing both distribution patterns and correlations between subjects for each house.
+
+#### Data Processing
+1. **CSV Parsing**: Read the training dataset and extract student data
+2. **House Segregation**: Separate students by their Hogwarts house (Gryffindor, Slytherin, Hufflepuff, Ravenclaw)
+3. **Feature Extraction**: Extract all 13 course grades for visualization
+
+#### Visualization Structure
+
+The pair plot is a 13x13 matrix where each cell represents the relationship between two courses:
+
+- **Diagonal Elements**: Histograms showing the distribution of grades for each individual course, separated by house
+- **Off-Diagonal Elements**: Scatter plots showing the correlation between pairs of courses, with points colored by house
+
+#### Matrix Interpretation
+
+**Diagonal Histograms**: Show the grade distribution for each course. Overlapping histograms by house reveal:
+- Which houses perform better in specific subjects
+- The spread and skewness of grades within each house
+- Outliers and grade clustering patterns
+
+**Scatter Plots**: Reveal correlations between course pairs:
+- **Positive correlation**: Points form an upward trend (students good at one subject tend to be good at the other)
+- **Negative correlation**: Points form a downward trend (inverse relationship between subjects)
+- **No correlation**: Points appear randomly scattered
+- **House-specific patterns**: Different colored clusters can reveal house-specific correlations
+
+#### Results
+
+The pair plot provides a comprehensive overview of the Hogwarts academic landscape, enabling identification of:
+- Courses with similar difficulty levels across houses
+- Subject combinations that students excel at together
+- House-specific academic strengths and weaknesses
+- Overall correlation structure in the curriculum
+
+This visualization complements the individual analyses by providing a holistic view of all course relationships simultaneously.
 
 <h3>Logistic Regression</h3>
