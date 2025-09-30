@@ -1,6 +1,24 @@
 import matplotlib.pyplot as plt
 import sys, utils, maths
 
+def histogram_plot(all_students, index_course, ax=None):
+    gryffindor_origin, slytherin_origin, hufflepuff_origin, ravenclaw_origin = utils.get_houses(all_students, index_course)
+    if ax is None:
+        ax = plt
+    # Construire l'histogramme
+    if ax is plt:
+        plt.hist(ravenclaw_origin, bins=20, alpha=0.7, label="Ravenclaw")
+        plt.hist(hufflepuff_origin, bins=20, alpha=0.7, label="Hufflepuff") 
+        plt.hist(gryffindor_origin, bins=20, alpha=0.7, label="Gryffindor")
+        plt.hist(slytherin_origin, bins=20, alpha=0.7, label="Slytherin")
+        return plt
+    else:
+        ax.hist(ravenclaw_origin, bins=20, alpha=0.7, label="Ravenclaw")
+        ax.hist(hufflepuff_origin, bins=20, alpha=0.7, label="Hufflepuff") 
+        ax.hist(gryffindor_origin, bins=20, alpha=0.7, label="Gryffindor")
+        ax.hist(slytherin_origin, bins=20, alpha=0.7, label="Slytherin")
+        return ax
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: python describe.py <file.csv>")
@@ -83,39 +101,12 @@ def main():
     print(f"🏆 MOST HOMOGENEOUS COURSE: {most_homogeneous}")
     print(f"📊 COEFFICIENT OF VARIATION: {min_cv:.2f}%")
 
-    # Recuperer les notes non normalisées pour l'histogramme
-    gryffindor_origin = []
-    slytherin_origin = []
-    hufflepuff_origin = []
-    ravenclaw_origin = []
-    for student in all_students:
-        house = student[1]
-        note = student[min_index + 6]
-        if note:
-            try:
-                if house == "Gryffindor":
-                    gryffindor_origin.append(float(note))
-                elif house == "Slytherin":
-                    slytherin_origin.append(float(note))
-                elif house == "Hufflepuff":
-                    hufflepuff_origin.append(float(note))
-                elif house == "Ravenclaw":
-                    ravenclaw_origin.append(float(note))
-
-            except ValueError:
-                pass
-
-    # Construire l'histogramme
-    plt.hist(ravenclaw_origin, bins=20, alpha=0.7, label="Ravenclaw")
-    plt.hist(hufflepuff_origin, bins=20, alpha=0.7, label="Hufflepuff") 
-    plt.hist(gryffindor_origin, bins=20, alpha=0.7, label="Gryffindor")
-    plt.hist(slytherin_origin, bins=20, alpha=0.7, label="Slytherin")
+    plt = histogram_plot(all_students, min_index)
     plt.title(f"Distribution of grades - {most_homogeneous}")
     plt.xlabel("GRADES")
     plt.ylabel("NUMBER OF STUDENTS")
     plt.legend()
     plt.show()
-
     return 0
 
 if __name__ == "__main__":

@@ -3,9 +3,25 @@ import sys
 import utils
 import maths
 
+def scatter_plot(x_gryff, y_gryff, x_huff, y_huff, x_raven, y_raven, x_slyth, y_slyth, ax=None):
+    if ax is None:
+        ax = plt
+    if ax is plt:
+        plt.scatter(x_gryff, y_gryff, color='red', label='Gryffindor', alpha=0.6)
+        plt.scatter(x_huff, y_huff, color='gold', label='Hufflepuff', alpha=0.6)
+        plt.scatter(x_raven, y_raven, color='blue', label='Ravenclaw', alpha=0.6)
+        plt.scatter(x_slyth, y_slyth, color='green', label='Slytherin', alpha=0.6)
+        return plt
+    else:
+        ax.scatter(x_gryff, y_gryff, color='red', label='Gryffindor', alpha=0.5, s=1)
+        ax.scatter(x_huff, y_huff, color='gold', label='Hufflepuff', alpha=0.5, s=1)
+        ax.scatter(x_raven, y_raven, color='blue', label='Ravenclaw', alpha=0.5, s=1)
+        ax.scatter(x_slyth, y_slyth, color='green', label='Slytherin', alpha=0.5, s=1)
+        return ax
+
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python describe.py <file.csv>")
+        print("Usage: python scatter_plot.py <file.csv>")
         return
     file = sys.argv[1]
     all_students = utils.lire_csv(file)
@@ -44,44 +60,16 @@ def main():
             best_pair = (course1, course2)
     print(f"Highest correlation is between {best_pair[0]} and {best_pair[1]}: {highest:.4f}")
 
-
     # Recuperer les notes des matieres pour le scatter plot par maison
     for course1, course2, coef in corr_coef:
         if (course1 == best_pair[0] and course2 == best_pair[1]):
-            x_gryff, y_gryff = [], []
-            x_huff, y_huff = [], []
-            x_raven, y_raven = [], []
-            x_slyth, y_slyth = [], []
-            for student in all_students[1:]:
-                note1 = student[utils.find_index(all_students[0], best_pair[0])]
-                note2 = student[utils.find_index(all_students[0], best_pair[1])]
-                house = student[1]
-                if note1 and note2:
-                    try:
-                        score1 = float(note1)
-                        score2 = float(note2)
-                        
-                        if house == 'Gryffindor':
-                            x_gryff.append(score1)
-                            y_gryff.append(score2)
-                        elif house == 'Hufflepuff':
-                            x_huff.append(score1)
-                            y_huff.append(score2)
-                        elif house == 'Ravenclaw':
-                            x_raven.append(score1)
-                            y_raven.append(score2)
-                        elif house == 'Slytherin':
-                            x_slyth.append(score1)
-                            y_slyth.append(score2)
-                    except ValueError:
-                        pass
+            x_gryff, y_gryff, x_huff, y_huff, x_raven, y_raven, x_slyth, y_slyth = \
+            utils.get_house_xy(all_students, utils.find_index(all_students[0], best_pair[0]), 
+                               utils.find_index(all_students[0], best_pair[1]))
             break
 
-    # Créer le scatter plot
-    plt.scatter(x_gryff, y_gryff, color='red', label='Gryffindor', alpha=0.6)
-    plt.scatter(x_huff, y_huff, color='gold', label='Hufflepuff', alpha=0.6)
-    plt.scatter(x_raven, y_raven, color='blue', label='Ravenclaw', alpha=0.6)
-    plt.scatter(x_slyth, y_slyth, color='green', label='Slytherin', alpha=0.6)
+    plt = scatter_plot(x_gryff, y_gryff, x_huff, y_huff, x_raven, y_raven, x_slyth, y_slyth)
+
     plt.title(f'Scatter Plot between {best_pair[0]} and {best_pair[1]}')
     plt.xlabel(best_pair[0])
     plt.ylabel(best_pair[1])
