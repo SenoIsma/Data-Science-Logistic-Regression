@@ -14,7 +14,7 @@
 <ul class="list-disc pl-4 my-0">
   <li class="my-0"><a href="#overview">Overview</a></li>
   <ul class="list-disc pl-4 my-0">
-    <li class="my-0"><a href="#introduction-to-python">Introduction to Python</a></li>
+    <li class="my-0"><a href="#the-basics-of-logistic-regression">The basics of logistic regression</a></li>
   </ul>
   <li class="my-0"><a href="#building-the-42-dslr-project">Building the 42 DSLR project</a>
   <ul class="list-disc pl-4 my-0">
@@ -28,7 +28,9 @@
 </ul>
 
 <h2>Overview</h2>
-<h3>Introduction to Python</h3>
+<h3>The basics of logistic regression</h3>
+
+
 
 <h2>Building the 42 DSLR project</h2>
 
@@ -102,21 +104,21 @@ This normalization is applied before calculating house averages and the CV.
 
 After applying global minimum normalization, the results show:
 
-| Subject | CV (%) |
-|---------|--------|
-| Arithmancy | 0.57 |
-| Astronomy | 2.02 |
-| Herbology | 0.02 |
-| Defense Against the Dark Arts | 0.02 |
-| Divination | 0.02 |
-| Muggle Studies | 1.76 |
-| Ancient Runes | 0.39 |
-| History of Magic | 0.02 |
-| Transfiguration | 0.17 |
-| Potions | 0.01 |
+| Subject                       | CV (%)   |
+|-------------------------------|----------|
+| Arithmancy                    | 0.57     |
+| Astronomy                     | 2.02     |
+| Herbology                     | 0.02     |
+| Defense Against the Dark Arts | 0.02     |
+| Divination                    | 0.02     |
+| Muggle Studies                | 1.76     |
+| Ancient Runes                 | 0.39     |
+| History of Magic              | 0.02     |
+| Transfiguration               | 0.17     |
+| Potions                       | 0.01     |
 | **Care of Magical Creatures** | **0.00** |
-| Charms | 0.03 |
-| Flying | 0.40 |
+| Charms                        | 0.03     |
+| Flying                        | 0.40     |
 
 **🏆 Most Homogeneous Course: Care of Magical Creatures (CV: 0.00%)**
 

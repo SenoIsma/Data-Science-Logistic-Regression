@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
-import sys
-import utils
-import maths
+import utils, maths
 
 def scatter_plot(x_gryff, y_gryff, x_huff, y_huff, x_raven, y_raven, x_slyth, y_slyth, ax=None):
     if ax is None:
@@ -20,11 +18,10 @@ def scatter_plot(x_gryff, y_gryff, x_huff, y_huff, x_raven, y_raven, x_slyth, y_
         return ax
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python scatter_plot.py <file.csv>")
-        return
-    file = sys.argv[1]
-    all_students = utils.lire_csv(file)
+    all_students = utils.lire_csv("./datasets/dataset_train.csv")
+    if not all_students:
+        print("Error reading the CSV file.")
+        return 1
 
     # Boucler sur chaque paire de matière
     corr_coef = []

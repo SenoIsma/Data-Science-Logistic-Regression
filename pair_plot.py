@@ -1,7 +1,5 @@
 import matplotlib.pyplot as plt
-import sys
-import utils
-import histogram, scatter_plot
+import utils, histogram, scatter_plot
 
 def wrap_label(label, max_len=15):
     # Coupe le nom des features en plusieurs lignes si trop long
@@ -22,12 +20,10 @@ def wrap_label(label, max_len=15):
     return "\n".join(lines)
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python pair_plot.py <file.csv>")
-        return
-    
-    file = sys.argv[1]
-    all_students = utils.lire_csv(file)
+    all_students = utils.lire_csv("./datasets/dataset_train.csv")
+    if not all_students:
+        print("Error reading the CSV file.")
+        return 1
 
     # Créer la figure avec plus d'espace
     fig, axes = plt.subplots(13, 13, figsize=(20, 20))

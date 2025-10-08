@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import sys, utils, maths
+import utils, maths
 
 def histogram_plot(all_students, index_course, ax=None):
     gryffindor_origin, slytherin_origin, hufflepuff_origin, ravenclaw_origin = utils.get_houses(all_students, index_course)
@@ -20,11 +20,10 @@ def histogram_plot(all_students, index_course, ax=None):
         return ax
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python describe.py <file.csv>")
-        return
-    file = sys.argv[1]
-    all_students = utils.lire_csv(file)
+    all_students = utils.lire_csv("./datasets/dataset_train.csv")
+    if not all_students:
+        print("Error reading the CSV file.")
+        return 1
 
     # Calculer le minimum global sur toutes les matières
     global_min = float('inf')

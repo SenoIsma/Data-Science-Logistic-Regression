@@ -48,6 +48,9 @@ def main():
 
     fichier = sys.argv[1]  # le premier argument après le script
     data = utils.lire_csv(fichier)
+    if not data or len(data) < 2:
+        print("Data file can be empty or invalid.")
+        return 1
 
     labels = ["", "Count", "Mean", "Std", "Min", "25%", "50%", "75%", "Max"]
     results = [[label] for label in labels]  # transforme chaque label en sous-liste
