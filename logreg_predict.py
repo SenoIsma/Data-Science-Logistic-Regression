@@ -1,8 +1,10 @@
 import utils, sys
 
 def main():
+    """Main function to predict using logistic regression model."""
+
     if len(sys.argv) < 3:
-        print("Usage: python describe.py <data_file.csv> <model_file.csv>")
+        print("Usage: python logreg_predict.py datasets/dataset_test.csv weights_trained.csv")
         return 1
     data_file = sys.argv[1]
     model_file = sys.argv[2]

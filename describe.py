@@ -1,6 +1,8 @@
 import utils, maths, sys
 
 def print_formatted_table(results):
+    """Print the results in a well-formatted table."""
+
     if not results or not results[0]:
         return
     
@@ -42,6 +44,8 @@ def print_formatted_table(results):
         print(" ".join(formatted_cells))
 
 def main():
+    """Main function to describe the dataset."""
+
     if len(sys.argv) < 2:
         print("Usage: python describe.py <file.csv>")
         return

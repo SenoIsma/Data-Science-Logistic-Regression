@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import utils, maths
 
 def histogram_plot(all_students, index_course, ax=None):
+    """Plot histogram of grades for each house for the given course index."""
+
     gryffindor_origin, slytherin_origin, hufflepuff_origin, ravenclaw_origin = utils.get_houses(all_students, index_course)
     if ax is None:
         ax = plt
@@ -20,6 +22,8 @@ def histogram_plot(all_students, index_course, ax=None):
         return ax
 
 def main():
+    """Main function to find the most homogeneous course based on coefficient of variation."""
+
     all_students = utils.lire_csv("./datasets/dataset_train.csv")
     if not all_students:
         print("Error reading the CSV file.")

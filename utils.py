@@ -1,6 +1,8 @@
 import csv
 
 def lire_csv(fichier):
+    """Read a CSV file and return its content as a list of lists."""
+
     tableau = []
     try:
         with open(fichier, "r", encoding="utf-8") as f:
@@ -13,6 +15,8 @@ def lire_csv(fichier):
         return []
 
 def is_numeric_column(tableau, col_index):
+    """Check if a column in the table is numeric."""
+
     if col_index == 0:
         return False  # Ignorer la première colonne
     numeric_count = 0
@@ -27,12 +31,16 @@ def is_numeric_column(tableau, col_index):
     return numeric_count > 0  # Au moins une valeur numérique trouvée
 
 def find_index(header, subject_name):
+    """Find the index of a subject in the header row."""
+
     for subject_index in range(6, len(header)):
         if header[subject_index] == subject_name:
             return subject_index
     return -1
 
 def get_course_name(index):
+    """Get the course name based on its index."""
+
     course_names = [
         "Arithmancy", "Astronomy", "Herbology", "Defense Against the Dark Arts",
         "Divination", "Muggle Studies", "Ancient Runes", "History of Magic",
@@ -44,6 +52,8 @@ def get_course_name(index):
     return "Unknown Course"
 
 def get_houses(all_students, index_course):
+    """Get the grades for each house in a specific course."""
+
     # Recuperer les notes
     gryffindor_origin = []
     slytherin_origin = []
@@ -69,6 +79,8 @@ def get_houses(all_students, index_course):
     return gryffindor_origin, slytherin_origin, hufflepuff_origin, ravenclaw_origin
 
 def get_house_xy(all_students, index1, index2):
+    """Get the grades for each house in two specific courses."""
+
     # Recuperer les notes des matieres pour le scatter plot par maison
     x_gryff, y_gryff = [], []
     x_huff, y_huff = [], []

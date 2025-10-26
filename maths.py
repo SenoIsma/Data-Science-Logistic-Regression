@@ -1,6 +1,8 @@
 # ========================= describe =============================
 
 def sum(tableau):
+    """Calculate the sum of a column in a 2D array."""
+
     total = 0
     for row in tableau:
         try:
@@ -10,6 +12,8 @@ def sum(tableau):
     return total
 
 def count(tableau, col_index):
+    """Count the number of valid entries in a column."""
+
     count = 0
     for row in tableau[1:]:  # Ignorer l'en-tête
         try:
@@ -20,6 +24,8 @@ def count(tableau, col_index):
     return count
 
 def mean(tableau, col_index):
+    """Calculate the mean of a column in a 2D array."""
+
     total = 0
     count = 0
     for row in tableau[1:]:  # Ignorer l'en-tête
@@ -31,6 +37,8 @@ def mean(tableau, col_index):
     return total / count if count > 0 else 0
 
 def std(tableau, col_index):
+    """Calculate the standard deviation of a column in a 2D array."""
+
     m = mean(tableau, col_index)
     total = 0
     count = 0
@@ -45,6 +53,8 @@ def std(tableau, col_index):
     return variance ** 0.5
 
 def min(tableau, col_index):
+    """Calculate the minimum of a column in a 2D array."""
+
     minimum = float('inf')
     for row in tableau[1:]:  # Ignorer l'en-tête
         try:
@@ -56,6 +66,8 @@ def min(tableau, col_index):
     return minimum if minimum != float('inf') else None
 
 def max(tableau, col_index):
+    """Calculate the maximum of a column in a 2D array."""
+
     maximum = float('-inf')
     for row in tableau[1:]:  # Ignorer l'en-tête
         try:
@@ -67,6 +79,8 @@ def max(tableau, col_index):
     return maximum if maximum != float('-inf') else None
 
 def percentile(tableau, col_index, percent):
+    """Calculate the given percentile of a column in a 2D array."""
+
     values = []
     for row in tableau[1:]:  # Ignorer l'en-tête
         try:
@@ -92,6 +106,8 @@ def percentile(tableau, col_index, percent):
 # ========================= histogram ============================
 
 def calculate_average(score_list):
+    """Calculate the average of a list of scores."""
+
     if len(score_list) == 0:
         return 0
     average = sum(score_list)
@@ -99,14 +115,20 @@ def calculate_average(score_list):
     return result
 
 def search_min(gryffindor, slytherin, hufflepuff, ravenclaw):
+    """Find the minimum grade among all houses."""
+
     all_notes = gryffindor + slytherin + hufflepuff + ravenclaw
     return min(all_notes) if all_notes else 0
 
 def normalize_positive(notes_list, global_min):
+    """Normalize grades to ensure all are positive."""
+
     # Décaler pour que le minimum soit à 1 (évite les moyennes nulles)
     return [note - global_min + 1 for note in notes_list]
 
 def calculate_std(mean_list):
+    """Calculate the standard deviation of a list of means."""
+
     if len(mean_list) == 0:
         return 0
     m = sum(mean_list) / len(mean_list)
@@ -119,6 +141,8 @@ def calculate_std(mean_list):
 # ========================= scatter plot =========================
 
 def calculate_correlation_coefficient(x, y):
+    """Calculate the Pearson correlation coefficient between two lists."""
+
     n = len(x)
     sum_x = sum(x)
     sum_y = sum(y)

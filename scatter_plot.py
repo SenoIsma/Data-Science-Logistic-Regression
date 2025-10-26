@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import utils, maths
 
 def scatter_plot(x_gryff, y_gryff, x_huff, y_huff, x_raven, y_raven, x_slyth, y_slyth, ax=None):
+    """Plot scatter plot of grades for each house."""
+
     if ax is None:
         ax = plt
     if ax is plt:
@@ -18,6 +20,8 @@ def scatter_plot(x_gryff, y_gryff, x_huff, y_huff, x_raven, y_raven, x_slyth, y_
         return ax
 
 def main():
+    """Main function to find the pair of courses with highest correlation and plot scatter plot."""
+
     all_students = utils.lire_csv("./datasets/dataset_train.csv")
     if not all_students:
         print("Error reading the CSV file.")

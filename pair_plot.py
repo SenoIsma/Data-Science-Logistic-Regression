@@ -2,6 +2,8 @@ import matplotlib.pyplot as plt
 import utils, histogram, scatter_plot
 
 def wrap_label(label, max_len=15):
+    """Wrap label text to fit within max_len characters per line."""
+
     # Coupe le nom des features en plusieurs lignes si trop long
     words = label.split()
     lines = []
@@ -20,6 +22,8 @@ def wrap_label(label, max_len=15):
     return "\n".join(lines)
 
 def main():
+    """Main function to create a pair plot of student grades by course."""
+
     all_students = utils.lire_csv("./datasets/dataset_train.csv")
     if not all_students:
         print("Error reading the CSV file.")
