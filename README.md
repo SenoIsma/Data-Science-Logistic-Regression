@@ -198,3 +198,10 @@ The pair plot provides a comprehensive overview of the Hogwarts academic landsca
 This visualization complements the individual analyses by providing a holistic view of all course relationships simultaneously.
 
 <h3>Logistic Regression</h3>
+
+#### Definition
+
+**Model type**    : `ŷ = σ(θ_0 + θ_1 x 1 + … + θ_n x_n)`
+**Output nature** : `Probabylity ∈ [0, 1]`
+
+####
