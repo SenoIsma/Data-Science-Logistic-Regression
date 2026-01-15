@@ -156,3 +156,14 @@ def calculate_correlation_coefficient(x, y):
     if denominator == 0:
         return 0
     return numerator / denominator
+
+# ========================= matrix operations =====================
+
+def transpose_matrix(x):
+    return list(map(list, zip(*x)))
+
+def vector_dot(a, b):
+    return sum(a[i] * b[i] for i in range(len(a)))
+
+def mat_vec_dot(M, v):
+    return [vector_dot(row, v) for row in M]

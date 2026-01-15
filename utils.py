@@ -14,6 +14,17 @@ def lire_csv(fichier):
         print(f"Erreur : le fichier {fichier} n'existe pas.")
         return []
 
+def ecrire_csv(fichier, data):
+    """Write data (list of lists) to a CSV file."""
+
+    try:
+        with open(fichier, "w", newline='', encoding="utf-8") as f:
+            ecrivain = csv.writer(f, delimiter=",")  # ou ";" selon ton besoin
+            for ligne in data:
+                ecrivain.writerow(ligne)
+    except Exception as e:
+        print(f"Erreur lors de l'écriture dans le fichier {fichier} : {e}")
+
 def is_numeric_column(tableau, col_index):
     """Check if a column in the table is numeric."""
 
