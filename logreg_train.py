@@ -140,12 +140,11 @@ def fit_one_vs_all(X, y, num_labels, lr=0.1, iters=300):
 
         for _ in range(iters):
             z = X @ theta
-            h = sigmoid(z)
+            y_hat = sigmoid(z)  # calculer la prédiction
+            gradient = (1 / m) * (X.T @ (y_hat - y_binary))
+            theta -= lr * gradient  # mise à jour des poids
 
-            gradient = (1 / m) * (X.T @ (h - y_binary))
-            theta -= lr * gradient
-
-        all_weights.append(theta)
+        all_weights.append(theta)  # stocker les poids pour chaque class
 
     return np.array(all_weights)
 
@@ -175,6 +174,9 @@ def main():
     x_train, x_test, y_train, y_test = data_spliter(X, y_encoded, 0.8)
 
     # ------------------ Polynomial features ------------------
+    # puissance => 2 CAR pour ~13 features (hors Index, Names, Birthday) :
+    # 1 : 13 features / 2 : ~104 features / 3 : ~455 features (trop!)
+    # ET 1 ne permet pas de capturer les interactions non linéaires
     x_train_poly = add_polynomial_features(x_train, 2)
     x_test_poly = add_polynomial_features(x_test, 2)
 
@@ -183,6 +185,7 @@ def main():
     x_test_norm = apply_normalization(x_test_poly, mean, std)
 
     # ------------------ One-vs-all training ------------------
+    # learning rate : 0.1 car normalisation des features
     num_labels = len(set(y_train))
     weights = fit_one_vs_all(
         x_train_norm, y_train,
