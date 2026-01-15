@@ -1,5 +1,6 @@
-import utils, maths, sys
-import random, math
+import sys
+import utils
+import numpy as np
 from itertools import combinations_with_replacement
 
 def parse_dataset(data):
@@ -8,7 +9,6 @@ def parse_dataset(data):
 
     label_index = header.index("Hogwarts House")
 
-    # Colonnes numériques valides
     valid_cols = []
     for i, name in enumerate(header):
         if i == label_index:
@@ -18,191 +18,137 @@ def parse_dataset(data):
 
     X = []
     y = []
-
     for row in rows:
         if len(row) != len(header):
             continue
-
         y.append(row[label_index])
-
         features = []
         for i in valid_cols:
             try:
                 features.append(float(row[i]))
             except:
-                features.append(0.0)  # valeur manquante
-
+                features.append(0.0)
         X.append(features)
 
-    return X, y
+    return np.array(X), np.array(y)
 
 
 def encode_labels(y):
-    houses = list(set(y))
-    mapping = {house: i for i, house in enumerate(houses)}
-
-    y_encoded = [mapping[label] for label in y]
-
+    houses = list(set(y)) # set -> créé un ensemble unique et list -> convertit en liste
+    mapping = {house: i for i, house in enumerate(houses)} # dictionnaire de mappage
+    y_encoded = np.array([mapping[label] for label in y])
     return y_encoded, mapping
 
-def data_spliter(x, y, proportion):
-    """
-        Shuffles and splits the dataset (given by x and y) into a training and a test set,
-        while respecting the given proportion of examples to be kept in the training set.
-    """
-    if not isinstance(x, list) or not isinstance(y, list):
-        return None
-    if len(x) == 0 or len(y) == 0:
-        return None
-    if len(x) != len(y):
-        return None
-    if not isinstance(proportion, float) or not (0 < proportion < 1):
-        return None
 
-    m = len(x)
-
-    # Création et mélange des indices
-    indices = list(range(m))
-    random.shuffle(indices)
-
-    # Shuffle des données
-    x_shuffled = [x[i] for i in indices]
-    y_shuffled = [y[i] for i in indices]
-
-    # Découpage
+def data_spliter(X, y, proportion):
+    if not isinstance(X, np.ndarray) or not isinstance(y, np.ndarray) or not isinstance(proportion, float):
+        return None
+    if X.ndim != 2 or y.ndim != 1:
+        return None
+    if len(X) == 0 or len(y) == 0 or len(X) != len(y):
+        return None
+    if proportion <= 0 or proportion >= 1:
+        return None
+    m = len(X)
+    indices = np.random.permutation(m) # melange les indices
     train_size = int(m * proportion)
+    train_idx = indices[:train_size] # stock les proportion des premiers indices pour le train
+    test_idx = indices[train_size:] # stock les proportion des derniers indices pour le test
 
-    x_train = x_shuffled[:train_size]
-    x_test = x_shuffled[train_size:]
-    y_train = y_shuffled[:train_size]
-    y_test = y_shuffled[train_size:]
-
-    return x_train, x_test, y_train, y_test
+    return X[train_idx], X[test_idx], y[train_idx], y[test_idx]
 
 
-def add_polynomial_features(x, power):
+def add_polynomial_features(X, power):
     """
         Add polynomial features to matrix X for all columns and all combinations up to 'power'.
     """
-    if not isinstance(x, list) or len(x) == 0:
+    if not isinstance(X, np.ndarray) or not isinstance(power, int):
         return None
-    if not all(isinstance(row, list) for row in x):
+    if X.ndim != 2 or X.shape[0] == 0:
         return None
-    if not isinstance(power, int) or power < 1:
+    if power < 1:
         return None
-
-    m = len(x)
-    n = len(x[0])
-
-    # Vérifier que toutes les lignes ont la même taille
-    if not all(len(row) == n for row in x):
-        return None
-
-    X_poly = [[] for _ in range(m)]
-
+    m, n = X.shape
+    features = []
     for p in range(1, power + 1):
         for comb in combinations_with_replacement(range(n), p):
-            # Calcul du produit pour chaque ligne
-            for i in range(m):
-                prod = 1
-                for idx in comb:
-                    prod *= x[i][idx]
-                X_poly[i].append(prod)
+            prod = np.ones(m)
+            for idx in comb:
+                prod *= X[:, idx]
+            features.append(prod)
 
-    return X_poly
+    return np.column_stack(features)
 
-def normalize_features(x):
-        """
-            Normalize features in X.
-        """
-        if not isinstance(x, list) or len(x) == 0:
-            return None
-        # mean = maths.mean(x, axis=0)
-        # std = maths.std(x, axis=0)
-        m = len(x)
-        n = len(x[0])
-        # Calcul des moyennes
-        mean = []
-        for j in range(n):
-            col_sum = 0
-            for i in range(m):
-                col_sum += x[i][j]
-            mean.append(col_sum / m)
-        # Calcul des écarts-types
-        std = []
-        for j in range(n):
-            var = 0
-            for i in range(m):
-                var += (x[i][j] - mean[j]) ** 2
-            std.append(math.sqrt(var / m))
-        # Normalisation
-        X_norm = []
-        for i in range(m):
-            row = []
-            for j in range(n):
-                if std[j] == 0:
-                    row.append(0)  # éviter division par 0
-                else:
-                    row.append((x[i][j] - mean[j]) / std[j])
-            X_norm.append(row)
 
-        return X_norm, mean, std
+def normalize_features(X):
+    """
+        Normalize features in X.
+    """
+    if not isinstance(X, np.ndarray):
+        return None
+    if X.ndim != 2 or X.shape[0] == 0:
+        return None
+    mean = np.mean(X, axis=0)
+    std = np.std(X, axis=0)
 
-def apply_normalization(x, mean, std):
-    X_norm = []
-    for row in x:
-        new_row = []
-        for j in range(len(row)):
-            if std[j] == 0:
-                new_row.append(0)
-            else:
-                new_row.append((row[j] - mean[j]) / std[j])
-        X_norm.append(new_row)
-    return X_norm
+    std[std == 0] = 1  # éviter division par 0
+    X_norm = (X - mean) / std
+
+    return X_norm, mean, std
+
+def apply_normalization(X, mean, std):
+    if not isinstance(X, np.ndarray)or  not isinstance(mean, np.ndarray) or not isinstance(std, np.ndarray):
+        return None
+    if X.ndim != 2 or mean.ndim != 1 or std.ndim != 1:
+        return None
+    if X.shape[1] != len(mean):
+        return None
+    std[std == 0] = 1
+    return (X - mean) / std
 
 def sigmoid(z):
-    """Compute the sigmoid function."""
-    if isinstance(z, list):
-        return [1 / (1 + math.exp(-zi)) for zi in z]
-    else:
-        return 1 / (1 + math.exp(-z))
+    """
+        Compute the sigmoid function.
+    """
+    z = np.clip(z, -500, 500) # limite les valeurs de z dans un intervalle (-500, 500) pour éviter overflow
+    return 1 / (1 + np.exp(-z))
 
-def fit_one_vs_all(x, y, num_labels, learning_rate=0.01, num_iterations=1000):
+
+def fit_one_vs_all(X, y, num_labels, lr=0.1, iters=300):
     """
         Trains multiple logistic regression classifiers using one-vs-all strategy.
     """
-    if not isinstance(x, list) or len(x) == 0:
+    if not isinstance(X, np.ndarray) or not isinstance(y, np.ndarray) or not isinstance(num_labels, int) \
+        or not isinstance(lr, float) or not isinstance(iters, int):
         return None
-    if not isinstance(y, list) or len(y) == 0:
+    if X.ndim != 2 or y.ndim != 1:
         return None
-    if len(x) != len(y):
+    if len(X) == 0 or len(y) == 0 or len(X) != len(y):
         return None
-    if not isinstance(num_labels, int) or num_labels < 2:
+    if num_labels < 2:
         return None
-
-    m = len(x)
-    n = len(x[0])
+    m, n = X.shape
     all_weights = []
 
+    # biais
+    X = np.c_[np.ones(m), X]  # ajouter une colonne de biais (1) à X
+    n += 1
+
     for label in range(num_labels):
-        # Initialiser les poids
-        weights = [0.0] * n
+        theta = np.zeros(n)
+        y_binary = (y == label).astype(int)
 
-        # Convertir y en vecteur binaire pour la classe actuelle
-        y_binary = [1 if yi == label else 0 for yi in y]
+        for _ in range(iters):
+            z = X @ theta
+            h = sigmoid(z)
 
-        x_T = maths.transpose_matrix(x)
+            gradient = (1 / m) * (X.T @ (h - y_binary))
+            theta -= lr * gradient
 
-        # Gradient descent
-        for iteration in range(num_iterations):
-            predictions = sigmoid(maths.mat_vec_dot(x, weights))
-            errors = [predictions[i] - y_binary[i] for i in range(m)]
-            gradient = maths.mat_vec_dot(x_T, errors)
-            weights = [weights[j] - (learning_rate / m) * gradient[j] for j in range(n)]
+        all_weights.append(theta)
 
-        all_weights.append(weights)
+    return np.array(all_weights)
 
-    return all_weights
 
 def main():
     """
@@ -217,18 +163,16 @@ def main():
     
     # ------------------ Load data ------------------
     file = sys.argv[1]
-    all_students = utils.lire_csv(file)
+    data = utils.lire_csv(file)
 
-    if not all_students or len(all_students) < 2:
+    if not data or len(data) < 2:
         print("Data file can be empty or invalid.")
         return 1
 
     # ------------------ Split data ------------------
-    X, y = parse_dataset(all_students)
+    X, y = parse_dataset(data)
     y_encoded, mapping = encode_labels(y)
-    x_train, x_test, y_train, y_test = data_spliter(
-        X, y_encoded, 0.8
-    )
+    x_train, x_test, y_train, y_test = data_spliter(X, y_encoded, 0.8)
 
     # ------------------ Polynomial features ------------------
     x_train_poly = add_polynomial_features(x_train, 2)
@@ -240,10 +184,15 @@ def main():
 
     # ------------------ One-vs-all training ------------------
     num_labels = len(set(y_train))
-    weights = fit_one_vs_all(x_train_norm, y_train, num_labels, learning_rate=0.1, num_iterations=300)
+    weights = fit_one_vs_all(
+        x_train_norm, y_train,
+        num_labels,
+        lr=0.1,
+        iters=300
+    )
 
     # ------------------ Save weights to CSV ------------------
-    utils.ecrire_csv("weights.csv", weights)
+    utils.ecrire_csv("weights.csv", weights.tolist())
 
     return 0
 

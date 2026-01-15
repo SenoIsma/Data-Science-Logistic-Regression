@@ -6,7 +6,7 @@ def lire_csv(fichier):
     tableau = []
     try:
         with open(fichier, "r", encoding="utf-8") as f:
-            lecteur = csv.reader(f, delimiter=",")  # ou ";" selon ton fichier
+            lecteur = csv.reader(f, delimiter=",")
             for ligne in lecteur:
                 tableau.append(ligne)
         return tableau
@@ -19,7 +19,7 @@ def ecrire_csv(fichier, data):
 
     try:
         with open(fichier, "w", newline='', encoding="utf-8") as f:
-            ecrivain = csv.writer(f, delimiter=",")  # ou ";" selon ton besoin
+            ecrivain = csv.writer(f, delimiter=",")
             for ligne in data:
                 ecrivain.writerow(ligne)
     except Exception as e:
