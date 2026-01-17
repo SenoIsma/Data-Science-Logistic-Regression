@@ -244,8 +244,8 @@ def main():
     for iters in iterations_to_test:
         # learning rate : 0.1 car normalisation des features
         model = LogisticRegression(lr=0.1, iters=iters)
-        # puissance     : 2 CAR pour ~13 features (hors Index, Names, Birthday) :
-            # 1 : 13 features / 2 : ~104 features / 3 : ~455 features (trop!)
+        # puissance     : 2 CAR pour ~14 features (hors Index, Names, Birthday) :
+            # 1 : 14 features / 2 : ~104 features / 3 : ~455 features (trop!)
             # ET 1 ne permet pas de capturer les interactions non linéaires
         model.fit(X_train, y_train, num_labels, polynomial_degree=2, 
                   label_mapping=mapping, inverse_mapping=inverse_mapping)
