@@ -12,10 +12,6 @@
 
 <h2>Table of Contents</h2>
 <ul class="list-disc pl-4 my-0">
-  <li class="my-0"><a href="#overview">Overview</a></li>
-  <ul class="list-disc pl-4 my-0">
-    <li class="my-0"><a href="#the-basics-of-logistic-regression">The basics of logistic regression</a></li>
-  </ul>
   <li class="my-0"><a href="#building-the-42-dslr-project">Building the 42 DSLR project</a>
   <ul class="list-disc pl-4 my-0">
     <li class="my-0"><a href="#data-analysis">Data Analysis</a></li>
@@ -26,11 +22,6 @@
   </ul>
   </li>
 </ul>
-
-<h2>Overview</h2>
-<h3>The basics of logistic regression</h3>
-
-
 
 <h2>Building the 42 DSLR project</h2>
 
