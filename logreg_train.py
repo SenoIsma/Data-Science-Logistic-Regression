@@ -234,6 +234,8 @@ def main():
     # ------------------ Find optimal iterations ------------------
     num_labels = len(mapping)
     best_accuracy = 0
+    best_train_acc = 0
+    best_score = 0
     best_iter = 0
     best_model = None
     iterations_to_test = [100, 200, 300, 400, 500, 750, 1000, 1500, 2000]
@@ -253,12 +255,15 @@ def main():
         train_acc = model.accuracy(X_train, y_train)
         test_acc = model.accuracy(X_test, y_test)
         
-        if test_acc > best_accuracy:
+        score = 0.5 * train_acc + 0.5 * test_acc
+        if score > best_score:
             status = "✓ Improvement"
+            best_score = score
             best_accuracy = test_acc
+            best_train_acc = train_acc
             best_iter = iters
             best_model = model
-        elif abs(test_acc - best_accuracy) < 0.1:
+        elif abs(score - best_score) < 0.1:
             status = "≈ Stable"
         else:
             status = "⚠ Degradation"
@@ -268,7 +273,8 @@ def main():
     print("-"*70)
     print(f"\nOptimal result:")
     print(f"  → Number of iterations : {best_iter}")
-    print(f"  → Test accuracy : {best_accuracy:.2f}%\n")
+    print(f"  → Train accuracy : {best_train_acc:.2f}%")
+    print(f"  → Test accuracy : {best_accuracy:.2f}%")
 
     
     # ------------------ Save weights to CSV ------------------
